@@ -1,4 +1,5 @@
 import pygame
+from game.components.enemies.enemy_manager import EnemyManager
 from game.components.spaceship import Spaceship
 
 # game.utils.constants -> es un modulo donde tengo "objetos" en memoria como el BG (background)...etc
@@ -18,9 +19,9 @@ class Game:
         self.game_speed = 10
         self.x_pos_bg = 0
         self.y_pos_bg = 0
-    
     #Vamos a instancear Spaceship para poder traerla a la Clase Game()
-        self.player = Spaceship()
+        self.player = Spaceship("xwing")
+        self.enemy_manager = EnemyManager()
 
     # este es el "game loop"
     # # Game loop: events - update - draw
@@ -31,8 +32,6 @@ class Game:
             self.handle_events()
             self.update()
             self.draw()
-        else:
-            print(f"game is over because self.playing is", self.playing)
         pygame.display.quit()
         pygame.quit()
 
@@ -53,6 +52,7 @@ class Game:
         user_input = pygame.key.get_pressed()
         #Vamos a llamar a la clase Spaceship y que active la calse de update.
         self.player.update(user_input)
+        self.enemy_manager.update()
 
     # este metodo "dibuja o renderiza o refresca mis cambios en la pantalla del juego"
     # aca escribo ALGO de la logica "necesaria" -> repartimos responsabilidades entre clases
@@ -64,6 +64,7 @@ class Game:
         self.draw_background()
         #Ahora haremos lo mismo con el metodo update pero ahora con el metodo draw de Spaceship
         self.player.draw(self.screen)
+        self.enemy_manager.draw(self.screen)
         pygame.display.update()
         pygame.display.flip()
 
