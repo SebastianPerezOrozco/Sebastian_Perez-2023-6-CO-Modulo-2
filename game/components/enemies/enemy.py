@@ -12,11 +12,11 @@ class Enemy(Sprite):
     X_POS_LIST = [20, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1070]
     MOVEMENTS = [LEFT, RIGHT]
 
-    def __init__(self, enemy):
+    def __init__(self, name, imagen):
 
-        self.image = pygame.transform.scale(enemy , (58, 53))
+        self.image = pygame.transform.scale(imagen, (58, 53))
         self.rect = self.image.get_rect()
-        self.enemy = enemy # Una forma de instancear indirectamente.
+        
         # Posición de inicio
         self.rect.x = random.choice(self.X_POS_LIST)
         self.rect.y = -5
@@ -24,23 +24,24 @@ class Enemy(Sprite):
         # Factor de Movimiento
         self.movement = random.choice(self.MOVEMENTS)
         self.mov_x = 5
-        self.mov_y = 1
+        self.mov_y = 5
 
         self.amplitude = 1  # Amplitud del movimiento
         self.frequency = 50
 
-        if self.enemy == ENEMY_1:
-            self.name = "dv1"
-        else:
-            self.name = "dv2"
+        #Vamos a crear una lista para los enemigos 
+        self.name = name
+        self.enemies = []
+        self.num_enemies = 1
+
 
         #Vamos agregar un label para cada nave.
         self.font = pygame.font.Font(FONT_STYLE, 10) # Establecemos el tamaño y el tipo de fuente a emplear
-        self.label = self.font.render(f"Enemy: {self.name}", True, (255, 255, 255))
+        self.label = self.font.render(name, True, (255, 255, 255))
         self.label_rect = self.label.get_rect()
         self.label_rect.center = (self.rect.x, self.rect.y) 
 
-    def update(self, ship): #Llamamos ship para crear un camino para eliminar enemy de la lista de EnemyManager
+    def update(self): 
         
         if self.movement == LEFT:
             self.rect.x -= self.mov_x
@@ -50,10 +51,7 @@ class Enemy(Sprite):
             self.rect.y += self.mov_y
 
         self.update_movement()
-
-        if self.rect.y >= SCREEN_HEIGHT:
-            ship.remove(self)
-
+            
     def update_movement(self):
         if self.rect.x > SCREEN_WIDTH -60:
             self.movement = LEFT

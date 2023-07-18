@@ -1,5 +1,6 @@
 import pygame
 from pygame.sprite import Sprite
+from game.components.bullets.bullet import Bullet
 
 from game.utils.constants import FONT_STYLE, SCREEN_WIDTH, SPACESHIP, SCREEN_HEIGHT
 class Spaceship(Sprite):
@@ -38,7 +39,11 @@ class Spaceship(Sprite):
         if self.rect.y < SCREEN_HEIGHT-60: # Le ponemos el menos 60 dado a que si lo dejamos solo no se vería la nave
             self.rect.y += self.movement_factor
     
-    def update (self, user_input):
+    def shoot_bullet(self, game):
+        bullet = Bullet(self)
+        game.add_bullet(bullet)
+    
+    def update (self, user_input, game):
         #El user_input será una variable en la clase game la cual almacenará la funcion para determinar cual tecla ha sido presionada.
         #Vamos a emplear varias opciones para el movimiento, tanto las flechas como las letras que comúnmente se emplean en los videojuegos.
         #Empleamos en todos los casos con if para que podamos hacer movimientos combinados en el eje "y" y "x"
@@ -54,8 +59,14 @@ class Spaceship(Sprite):
         
         if user_input[pygame.K_DOWN] or user_input[pygame.K_s]:
             self.move_down()
-    
+
+        if user_input[pygame.K_SPACE]:
+            self.shoot_bullet(game)
+
+        elif  user_input[pygame.MOUSEBUTTONDOWN]:
+             self.shoot_bullet(game)
+
     def draw(self, screen):
         #Vamos a dibujar a Spaceship en las coordenadas previamente asiganadas en nuestro metodo constructor
         screen.blit(self.image, (self.rect.x, self.rect.y))
-        screen.blit(self.label, (self.rect.x - 5, self.rect.y + 65))
+        screen.blit(self.label, (self.rect.x - 5, self.rect.y + 55))

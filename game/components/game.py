@@ -1,14 +1,18 @@
+import random
 import pygame
-from game.components.enemies.enemy_manager import EnemyManager
+from game.components.enemies.enemy import Enemy
 from game.components.spaceship import Spaceship
 
 # game.utils.constants -> es un modulo donde tengo "objetos" en memoria como el BG (background)...etc
 #   tambien tenemos valores constantes como el title, etc
-from game.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS, DEFAULT_TYPE
+from game.utils.constants import BG, ENEMY_1, ENEMY_2, FONT_STYLE, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS, DEFAULT_TYPE
 
 # Game es la definicion de la clase (plantilla o molde para sacar objetos)
 # self es una referencia que indica que el metodo o el atributo es de cada "objeto" de la clase Game
 class Game:
+
+    ENEMIES = [ENEMY_1, ENEMY_2]
+
     def __init__(self):
         pygame.init() # este es el enlace con la libreria pygame para poder mostrar la pantalla del juego
         pygame.display.set_caption(TITLE) # Sele pone el titulo del juego en la ventana
@@ -19,16 +23,23 @@ class Game:
         self.game_speed = 10
         self.x_pos_bg = 0
         self.y_pos_bg = 0
+        self.score = 0
     #Vamos a instancear Spaceship para poder traerla a la Clase Game()
         self.player = Spaceship("xwing")
-        self.enemy_manager = EnemyManager()
+    
+    #Enemy
+        self.enemies = []
+        self.num_enemies = 2
+
+    #Bullets
+        self.bullets = []
+
 
     # este es el "game loop"
-    # # Game loop: events - update - draw
+    # Game loop: events - update - draw
     def run(self):
         self.playing = True
         while self.playing:
-            # print(f"I am still in the game loop")
             self.handle_events()
             self.update()
             self.draw()
@@ -51,9 +62,29 @@ class Game:
         #Primero definimos la variable de user_input la cual nos almacenará la funcion para identificar las teclas que se presionan.
         user_input = pygame.key.get_pressed()
         #Vamos a llamar a la clase Spaceship y que active la calse de update.
-        self.player.update(user_input)
-        self.enemy_manager.update()
+        self.player.update(user_input, self)
+        
+        #Enemy
+        for enemy in self.enemies:
+            enemy.update()
 
+            if enemy.rect.y >= SCREEN_HEIGHT:
+                self.enemies.remove(enemy)
+        
+        if len(self.enemies) < self.num_enemies:
+            enemy_name = f"Enemy: {len(self.enemies) + 1}"
+            new_enemy = Enemy(enemy_name, random.choice(self.ENEMIES))
+            self.enemies.append(new_enemy)
+
+        #Bullets 
+        for bullet in self.bullets:
+            bullet.update(self.bullets)
+
+            for enemy in self.enemies:
+                if bullet.rect.colliderect(enemy.rect):
+                    self.enemies.remove(enemy)
+                    self.score += 1
+            
     # este metodo "dibuja o renderiza o refresca mis cambios en la pantalla del juego"
     # aca escribo ALGO de la logica "necesaria" -> repartimos responsabilidades entre clases
     # o sea aqui deberia llamar a los metodos "draw" de mis otros objetos
@@ -64,7 +95,16 @@ class Game:
         self.draw_background()
         #Ahora haremos lo mismo con el metodo update pero ahora con el metodo draw de Spaceship
         self.player.draw(self.screen)
-        self.enemy_manager.draw(self.screen)
+        self.draw_score()
+
+        #Enemy
+        for enemy in self.enemies:
+            enemy.draw(self.screen)      
+
+        #Bullets
+        for bullet in self.bullets:
+            bullet.draw(self.screen)
+
         pygame.display.update()
         pygame.display.flip()
 
@@ -93,3 +133,12 @@ class Game:
         # No hay una velocidad de juego como tal, el "game_speed" simplemente me indica
         # cuanto me voy a mover (cuantos pixeles hacia arriba o abajo) cen el eje Y
         self.y_pos_bg += self.game_speed
+
+    def add_bullet(self, bullet):
+        if len(self.bullets) < 3:
+            self.bullets.append(bullet)
+
+    def draw_score(self):
+        font = pygame.font.Font(FONT_STYLE, 15)
+        text = font.render(f"Score: {self.score}", True, (255, 255, 255))
+        self.screen.blit(text,  (self.player.rect.x + 3, self.player.rect.y + 70))
