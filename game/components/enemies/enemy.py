@@ -1,5 +1,5 @@
+import math
 import random
-from typing import Any
 import pygame
 from pygame.sprite import Sprite
 
@@ -26,12 +26,13 @@ class Enemy(Sprite):
         self.mov_x = 5
         self.mov_y = 5
 
-        self.amplitude = 1  # Amplitud del movimiento
-        self.frequency = 50
-
+        self.amplitude = 10 # Amplitud del movimiento
+        self.frequency = 0.01
+    
         #Vamos a crear una lista para los enemigos 
         self.name = name
         self.enemies = []
+        self.enemy = imagen
         self.num_enemies = 1
 
 
@@ -42,13 +43,21 @@ class Enemy(Sprite):
         self.label_rect.center = (self.rect.x, self.rect.y) 
 
     def update(self): 
-        
-        if self.movement == LEFT:
-            self.rect.x -= self.mov_x
-            self.rect.y += self.mov_y
+        if self.enemy == ENEMY_2:
+            if self.movement == LEFT:
+                self.rect.x -= self.mov_x
+                self.rect.y += self.amplitude * math.sin(self.frequency * self.rect.x)
+            else:
+                self.rect.x += self.mov_x
+                self.rect.y += self.amplitude * math.sin(self.frequency * self.rect.x)
         else:
-            self.rect.x += self.mov_x
-            self.rect.y += self.mov_y
+            if self.movement == LEFT:
+                self.rect.x -= self.mov_x
+                self.rect.y += self.mov_y
+            else:
+                self.rect.x += self.mov_x
+                self.rect.y += self.mov_y
+            
 
         self.update_movement()
             
