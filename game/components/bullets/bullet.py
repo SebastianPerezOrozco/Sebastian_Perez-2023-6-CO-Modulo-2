@@ -13,10 +13,8 @@ class Bullet(Sprite):
      self.rect = self.imagen.get_rect()
      self.rect.center = spaceship.rect.center
 
-    def update (self, bullet):
+    def update (self):
         self.rect.y -= self.SPEED
-        if self.rect.y <= 0:
-           bullet.remove(self)
 
     def draw(self, screen):
        screen.blit(self.imagen, (self.rect.x, self.rect.y))
