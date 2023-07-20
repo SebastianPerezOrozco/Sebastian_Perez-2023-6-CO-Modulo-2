@@ -99,11 +99,11 @@ class Spaceship(Sprite):
         font_1 = pygame.font.Font(FONT_STYLE, 25)
         label = font_1.render(f"LEVEL : {game.level}", True, (255, 255, 255))
         screen.blit(label, (SCREEN_WIDTH // 2, 10))
-
+    
     def reset(self):
         self.rect.x = SCREEN_WIDTH//2
         self.rect.y = 500
         self.deaths_count += 1
-    
+
     
     

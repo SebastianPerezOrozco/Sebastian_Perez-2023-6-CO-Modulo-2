@@ -34,7 +34,7 @@ class Game:
         self.num_enemies = 2
     #Levels
         self.level = 1
-    
+
     # este es el "game loop"
     # Game loop: events - update - draw
     def run(self):
@@ -43,6 +43,9 @@ class Game:
             self.handle_events()
             self.update()
             self.draw()
+            self.show_menu()
+        pygame.display.quit()
+        pygame.quit()
 
     def handle_events(self):
         # esta expression es la llamada a un metodo pygame.event.get() que devuelve un "iterable"
@@ -70,7 +73,17 @@ class Game:
 
             if enemy.rect.y >= SCREEN_HEIGHT:
                 self.enemies.remove(enemy)
-            
+
+            if self.player.rect.colliderect(enemy.rect):
+                self.player.reset()
+                self.enemies.remove(enemy)
+
+
+        if len(self.enemies) < self.num_enemies:
+            enemy_name = f"Enemy: {len(self.enemies) + 1}"
+            new_enemy = Enemy(enemy_name, random.choice(self.ENEMIES))
+            self.enemies.append(new_enemy)
+ 
             if self.player.rect.colliderect(enemy.rect):
                 self.player.reset()
                 self.enemies.remove(enemy)
@@ -90,13 +103,19 @@ class Game:
         self.screen.fill((255, 255, 255)) # esta tupla (255, 255, 255) representa un codigo de color: blanco
         self.draw_background()
         #Ahora haremos lo mismo con el metodo update pero ahora con el metodo draw de Spaceship
+
         self.player.draw(self.screen, self)
         #Enemy
         for enemy in self.enemies:
             enemy.draw(self.screen)   
 
         self.font = pygame.font.Font(FONT_STYLE, 10) # Establecemos el tamaño y el tipo de fuente a emplear
-       
+
+        self.player.draw(self.screen)
+        #Enemy
+        for enemy in self.enemies:
+            enemy.draw(self.screen)      
+
         pygame.display.update()
         pygame.display.flip()
 
@@ -127,12 +146,14 @@ class Game:
         self.y_pos_bg += self.game_speed
 
     def show_menu(self):
+
         if self.player.deaths_count == 2:
             pygame.time.delay(1000)
             self.final_menu.update(self.player)
             self.final_menu.draw(self.screen)
-            self.final_menu.event(self.on_close, self.on_start)
-            
+            self.final_menu.event(self.on_close, self.run)
+            #self.reset()
+
     def on_close(self):
         self.playing = False
         
@@ -140,5 +161,4 @@ class Game:
         if self.player.score == 10:
             self.level += 1
             self.player.score = 0
-        
-        
+
