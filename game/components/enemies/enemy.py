@@ -12,7 +12,7 @@ class Enemy(Sprite):
     X_POS_LIST = [20, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050, 1070]
     MOVEMENTS = [LEFT, RIGHT]
 
-    def __init__(self, name, imagen):
+    def __init__(self, imagen):
 
         self.image = pygame.transform.scale(imagen, (58, 53))
         self.rect = self.image.get_rect()
@@ -28,17 +28,14 @@ class Enemy(Sprite):
 
         self.amplitude = 10 # Amplitud del movimiento
         self.frequency = 0.01
-    
-        #Vamos a crear una lista para los enemigos 
-        self.name = name
-        self.enemies = []
-        self.enemy = imagen
-        self.num_enemies = 1
 
+        self.enemy = imagen
+        self.enemy_counter = 0
+        self.enemy_name = f"Enemy: {self.enemy_counter + 1}"
 
         #Vamos agregar un label para cada nave.
         self.font = pygame.font.Font(FONT_STYLE, 10) # Establecemos el tamaño y el tipo de fuente a emplear
-        self.label = self.font.render(name, True, (255, 255, 255))
+        self.label = self.font.render(self.enemy_name, True, (255, 255, 255))
         self.label_rect = self.label.get_rect()
         self.label_rect.center = (self.rect.x, self.rect.y) 
 
@@ -70,3 +67,6 @@ class Enemy(Sprite):
     def draw(self, screen):
         screen.blit(self.image, (self.rect.x, self.rect.y))
         screen.blit(self.label, (self.rect.x , self.rect.y - 10))
+    
+    def increase_enemies(self):
+        pass

@@ -13,6 +13,11 @@ class Spaceship(Sprite):
         self.rect.x = SCREEN_WIDTH//2
         self.rect.y = 500
         self.movement_factor = 11 
+        #Bullets
+        self.bullets : list[Bullet] = []
+        self.score = 0
+        self.max_score = 0
+        self.deaths_count = 0
 
         #Vamos agregar un label para cada nave.
         self.font = pygame.font.Font(FONT_STYLE, 10) # Establecemos el tamaño y el tipo de fuente a emplear
@@ -39,9 +44,10 @@ class Spaceship(Sprite):
         if self.rect.y < SCREEN_HEIGHT-60: # Le ponemos el menos 60 dado a que si lo dejamos solo no se vería la nave
             self.rect.y += self.movement_factor
     
-    def shoot_bullet(self, game):
-        bullet = Bullet(self)
-        game.add_bullet(bullet)
+    def shoot_bullet(self):
+        if len(self.bullets) < 3:
+            bullet = Bullet(self)
+            self.bullets.append(bullet)
     
     def update (self, user_input, game):
         #El user_input será una variable en la clase game la cual almacenará la funcion para determinar cual tecla ha sido presionada.
@@ -61,12 +67,43 @@ class Spaceship(Sprite):
             self.move_down()
 
         if user_input[pygame.K_SPACE]:
-            self.shoot_bullet(game)
+            self.shoot_bullet()
 
-        elif  user_input[pygame.MOUSEBUTTONDOWN]:
-             self.shoot_bullet(game)
+        #Bullets 
+        for bullet in self.bullets:
+            bullet.update()
+            if bullet.rect.y <= 0:
+                self.bullets.remove(bullet)
+            for enemy in game.enemies:
+                if bullet.rect.colliderect(enemy.rect):
+                    game.enemies.remove(enemy)
+                    self.bullets.remove(bullet)
+                    self.score += 1
+                
 
-    def draw(self, screen):
+    def draw(self, screen, game):
         #Vamos a dibujar a Spaceship en las coordenadas previamente asiganadas en nuestro metodo constructor
         screen.blit(self.image, (self.rect.x, self.rect.y))
         screen.blit(self.label, (self.rect.x - 5, self.rect.y + 55))
+        #Score
+        font = pygame.font.Font(FONT_STYLE, 15)
+        text = font.render(f"Score: {self.score}", True, (255, 255, 255))
+        screen.blit(text,  (self.rect.x + 3, self.rect.y + 70))
+        #Bullets
+        for bullet in self.bullets:
+            bullet.draw(screen)
+        #Death count
+        text_1 = font.render(f"DEATHS COUNTER: {self.deaths_count}", True, (255, 255, 255))
+        screen.blit(text_1, (SCREEN_WIDTH - 180 , 10))
+        #Level
+        font_1 = pygame.font.Font(FONT_STYLE, 25)
+        label = font_1.render(f"LEVEL : {game.level}", True, (255, 255, 255))
+        screen.blit(label, (SCREEN_WIDTH // 2, 10))
+
+    def reset(self):
+        self.rect.x = SCREEN_WIDTH//2
+        self.rect.y = 500
+        self.deaths_count += 1
+    
+    
+    
