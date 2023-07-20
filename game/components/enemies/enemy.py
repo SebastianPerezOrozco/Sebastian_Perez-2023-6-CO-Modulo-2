@@ -2,6 +2,7 @@ import math
 import random
 import pygame
 from pygame.sprite import Sprite
+from game.components.bullets.bullet import Bullet
 
 from game.utils.constants import ENEMY_1, ENEMY_2, FONT_STYLE, SCREEN_HEIGHT, SCREEN_WIDTH
 
@@ -33,6 +34,9 @@ class Enemy(Sprite):
         self.enemy_counter = 0
         self.enemy_name = f"Enemy: {self.enemy_counter + 1}"
 
+        #Bullets
+        self.bullets : list[Bullet] = []
+        
         #Vamos agregar un label para cada nave.
         self.font = pygame.font.Font(FONT_STYLE, 10) # Establecemos el tamaño y el tipo de fuente a emplear
         self.label = self.font.render(self.enemy_name, True, (255, 255, 255))
@@ -55,9 +59,8 @@ class Enemy(Sprite):
                 self.rect.x += self.mov_x
                 self.rect.y += self.mov_y
             
-
         self.update_movement()
-            
+    
     def update_movement(self):
         if self.rect.x > SCREEN_WIDTH -60:
             self.movement = LEFT
@@ -67,6 +70,8 @@ class Enemy(Sprite):
     def draw(self, screen):
         screen.blit(self.image, (self.rect.x, self.rect.y))
         screen.blit(self.label, (self.rect.x , self.rect.y - 10))
+        for bullet in self.bullets:
+            bullet.draw(screen)
     
-    def increase_enemies(self):
+    def delete_bullet(self):
         pass

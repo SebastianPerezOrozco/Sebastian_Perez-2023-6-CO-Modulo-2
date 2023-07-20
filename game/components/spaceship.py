@@ -13,6 +13,7 @@ class Spaceship(Sprite):
         self.rect.x = SCREEN_WIDTH//2
         self.rect.y = 500
         self.movement_factor = 11 
+        self.ship_type ="player"
         #Bullets
         self.bullets : list[Bullet] = []
         self.score = 0
@@ -46,7 +47,7 @@ class Spaceship(Sprite):
     
     def shoot_bullet(self):
         if len(self.bullets) < 3:
-            bullet = Bullet(self)
+            bullet = Bullet(self, self.ship_type)
             self.bullets.append(bullet)
     
     def update (self, user_input, game):
@@ -104,6 +105,7 @@ class Spaceship(Sprite):
         self.rect.x = SCREEN_WIDTH//2
         self.rect.y = 500
         self.deaths_count += 1
+        
 
     
     
