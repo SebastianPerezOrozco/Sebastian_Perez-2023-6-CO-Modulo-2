@@ -2,7 +2,7 @@ import pygame
 from pygame.sprite import Sprite
 from game.components.bullets.bullet import Bullet
 
-from game.utils.constants import FONT_STYLE, SCREEN_WIDTH, SPACESHIP, SCREEN_HEIGHT
+from game.utils.constants import FONT_STYLE, SCREEN_WIDTH, SPACESHIP, SCREEN_HEIGHT, SPACESHIP_SHIELD
 class Spaceship(Sprite):
 
     def __init__(self, name):
@@ -17,6 +17,7 @@ class Spaceship(Sprite):
         #Bullets
         self.bullets : list[Bullet] = []
         self.score = 0
+        self.kills = 0
         self.max_score = 0
         self.deaths_count = 0
 
@@ -70,17 +71,25 @@ class Spaceship(Sprite):
         if user_input[pygame.K_SPACE]:
             self.shoot_bullet()
 
+        self.shield()
+        
         #Bullets 
         for bullet in self.bullets:
             bullet.update()
             if bullet.rect.y <= 0:
                 self.bullets.remove(bullet)
-            for enemy in game.enemies:
-                if bullet.rect.colliderect(enemy.rect):
-                    game.enemies.remove(enemy)
+            self.delete_enemies(game,bullet)
+            
+    def delete_enemies(self, game, bullet): 
+        for enemy in game.enemies:
+            if bullet.rect.colliderect(enemy.rect):
+                game.enemies.remove(enemy)
+                if bullet in self.bullets:
                     self.bullets.remove(bullet)
                     self.score += 1
-                
+                    self.kills += 1
+                else:
+                    print("There is not in the list")
 
     def draw(self, screen, game):
         #Vamos a dibujar a Spaceship en las coordenadas previamente asiganadas en nuestro metodo constructor
@@ -100,7 +109,17 @@ class Spaceship(Sprite):
         font_1 = pygame.font.Font(FONT_STYLE, 25)
         label = font_1.render(f"LEVEL : {game.level}", True, (255, 255, 255))
         screen.blit(label, (SCREEN_WIDTH // 2, 10))
+        #Shield
+        
     
+    def shield(self):
+        if self.kills >= 5:
+            self.image = pygame.transform.scale(SPACESHIP_SHIELD, (62, 56))
+            if self.kills > 10:
+                self.kills = 0
+        else:
+            self.image = pygame.transform.scale(SPACESHIP, (58, 53))
+        
     def reset(self):
         self.rect.x = SCREEN_WIDTH//2
         self.rect.y = 500

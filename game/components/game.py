@@ -25,7 +25,7 @@ class Game:
         self.y_pos_bg = 0
         
         
-        self.player = Spaceship("xwing")
+        self.player = Spaceship("Sebas")
         self.final_menu = FinalMenu()
         self.menu = Menu()
         self.pause = Pause()
@@ -50,6 +50,7 @@ class Game:
         self.level = 1
         self.player.score = 0
         self.player.deaths_count = 0 
+        self.player.kills = 0
         while self.playing:
             self.handle_events()
             if not self.paused:
@@ -58,7 +59,7 @@ class Game:
             if self.paused:
                 self.pause.draw(self.screen)
                 self.pause.event(self.on_close, self.off_paused)
-            if self.player.deaths_count > 0:
+            if self.player.deaths_count > 1:
                 self.playing = False 
                 
 
@@ -133,6 +134,7 @@ class Game:
         if self.player.score == 10:
             self.level += 1
             self.player.score = 0
+            self.player.kills = 0
     
     #Enemy
     def create_enemies(self):
@@ -145,10 +147,14 @@ class Game:
             enemy.update()
             if enemy.rect.y >= SCREEN_HEIGHT:
                 self.enemies.remove(enemy)
-            if self.player.rect.colliderect(enemy.rect):
+            if self.player.rect.colliderect(enemy.rect) and not self.player.kills >= 5:
                 pygame.time.delay(500)
                 self.player.reset()
                 self.enemies.remove(enemy)
+            elif self.player.kills >= 5 and self.player.rect.colliderect(enemy.rect):
+                self.enemies.remove(enemy)
+                self.player.score += 1
+                self.player.kills += 1
 
     def increase_enemies(self):
         if self.level == 2:
